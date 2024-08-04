@@ -1,0 +1,161 @@
+﻿@{
+    ViewData["Title"] = "Chat";
+    var messages = ViewBag.Messages as IEnumerable<ChatApp.Models.Message>;
+}
+
+    <title>Chat</title>
+    <style>
+        body {
+            background-color: #e0f7fa;
+            font-family: Arial, sans-serif;
+        }
+
+        .chat-container {
+            background-color: #fff9c4;
+            border-radius: 10px;
+            padding: 20px;
+            width: 50%;
+            margin: auto;
+            margin-top: 50px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        #messagesList {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+
+        .message-sender {
+            font-weight: bold;
+        }
+
+        .message-content {
+            display: inline;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+            .form-container input {
+                margin-bottom: 10px;
+                padding: 10px;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+            }
+
+        #sendButton {
+            background-color: #0288d1;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+            #sendButton:disabled {
+                background-color: #b0bec5;
+            }
+
+        .delete-button {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            float: right;
+        }
+    </style>
+    <div class="chat-container">
+        <div id="messagesList">
+            @if (messages != null)
+            {
+                @foreach (var message in messages)
+                {
+                    <div class="message" style="color: @(message.Sentiment == "positive" ? "green" : message.Sentiment == "negative" ? "red" : "black")">
+                        <span class="message-sender">@message.Sender: </span>
+                        <span class="message-content">@message.Content</span>
+                        <button class="delete-button" data-id="@message.Id">Delete</button>
+                    </div>
+                }
+            }
+        </div>
+        <div class="form-container">
+            <input id="userName" type="text" placeholder="Enter your username" />
+            <input type="text" id="messageInput" placeholder="Enter your message" />
+            <button id="sendButton" disabled="disabled">Send</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chat")
+            .build();
+
+        function addMessage(sender, message, sentiment, id) {
+            const messagesList = document.getElementById("messagesList");
+            const messageElement = document.createElement("div");
+            messageElement.classList.add("message");
+            messageElement.style.color = sentiment === 'positive' ? 'green' : sentiment === 'negative' ? 'red' : 'black';
+            messageElement.innerHTML = `<span class="message-sender">${sender}: </span><span class="message-content">${message}</span><button class="delete-button" data-id="${id}">Delete</button>`;
+            messagesList.appendChild(messageElement);
+            messagesList.scrollTop = messagesList.scrollHeight;
+        }
+
+        connection.on("ReceiveMessage", (sender, message, sentiment, id) => {
+            addMessage(sender, message, sentiment, id);
+        });
+
+        document.getElementById("sendButton").addEventListener("click", async () => {
+            const userName = document.getElementById("userName").value;
+            const message = document.getElementById("messageInput").value;
+            try {
+                await fetch('/Home/SendMessage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'sender': userName,
+                        'message': message
+                    })
+                });
+                document.getElementById("messageInput").value = '';
+            } catch (err) {
+                console.error('Error sending message:', err);
+            }
+        });
+
+        connection.start()
+            .then(function () {
+                document.getElementById("sendButton").disabled = false;
+            })
+            .catch(err => console.error(err.toString()));
+
+        document.getElementById("messagesList").addEventListener("click", async (e) => {
+            if (e.target.classList.contains("delete-button")) {
+                const id = e.target.getAttribute("data-id");
+                try {
+                    await fetch(`/Home/DeleteMessage/${id}`, {
+                        method: 'DELETE',
+                    });
+                    e.target.parentElement.remove();
+                } catch (err) {
+                    console.error('Error deleting message:', err);
+                }
+            }
+        });
+    </script>
