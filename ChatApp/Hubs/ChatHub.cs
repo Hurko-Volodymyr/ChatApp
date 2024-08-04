@@ -1,7 +1,4 @@
-﻿using Azure;
-using ChatApp.Data;
-using ChatApp.Models;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 
 namespace ChatApp.Hubs
 {

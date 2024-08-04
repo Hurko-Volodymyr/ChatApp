@@ -1,7 +1,11 @@
+using Azure;
+using Azure.AI.TextAnalytics;
+using ChatApp.Abstractions;
 using ChatApp.Data;
+using ChatApp.Data.Repositories;
 using ChatApp.Hubs;
+using ChatApp.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace ChatApp
 {
@@ -15,8 +19,15 @@ namespace ChatApp
             // Add services to the container.
             builder.Services.AddDbContext<ChatContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
-            builder.Services.AddSignalR();
-                //.AddAzureSignalR(builder.Configuration["AzureSignalR:ConnectionString"]);
+            builder.Services.AddSignalR(); builder.Services.AddSingleton<TextAnalyticsClient>(provider =>
+            {
+                var configuration = provider.GetRequiredService<IConfiguration>();
+                var endpoint = configuration["AzureTextAnalytics:Endpoint"];
+                var apiKey = configuration["AzureTextAnalytics:ApiKey"];
+                return new TextAnalyticsClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
+            });
+            builder.Services.AddScoped<IChatService, ChatService>();
+            builder.Services.AddScoped<IChatRepository, ChatRepository>();
 
             builder.Services.AddControllersWithViews();
 
