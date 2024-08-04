@@ -2,10 +2,8 @@ using ChatApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using ChatApp.Hubs;
-using Microsoft.EntityFrameworkCore;
-using ChatApp.Data;
+using ChatApp.Abstractions;
 
 namespace ChatApp.Controllers
 {
@@ -13,21 +11,24 @@ namespace ChatApp.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IHubContext<ChatHub> _hubContext;
-        private readonly ChatContext _context;
+        private readonly IChatService _chatService;
 
-        public HomeController(ILogger<HomeController> logger, IHubContext<ChatHub> hubContext, ChatContext context)
+        public HomeController(ILogger<HomeController> logger, IHubContext<ChatHub> hubContext, IChatService chatService)
         {
             _logger = logger;
             _hubContext = hubContext;
-            _context = context;
+            _chatService = chatService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var messages = await _context.Messages
-                .OrderBy(m => m.Timestamp)
-                .ToListAsync();
+            var messages = await _chatService.GetAllMessagesAsync();
             ViewBag.Messages = messages;
+            return View();
+        }
+
+        public IActionResult Privacy()
+        {
             return View();
         }
 
@@ -40,34 +41,21 @@ namespace ChatApp.Controllers
 
             sender ??= "Anonymous";
 
-            var msg = new Message
-            {
-                Sender = sender,
-                Content = message,
-                Timestamp = DateTime.UtcNow,
-                Sentiment = "neutral"
-            };
-            _context.Messages.Add(msg);
-            await _context.SaveChangesAsync();
+            var msg = await _chatService.AddMessageAsync(sender, message);
 
-            await _hubContext.Clients.All.SendAsync("ReceiveMessage", sender, message);
-
+            await _hubContext.Clients.All.SendAsync("ReceiveMessage", msg.Sender, msg.Content);
             return Ok();
         }
 
         public async Task<IActionResult> DeleteMessage(int id)
         {
-            var message = await _context.Messages.FindAsync(id);
-            if (message == null)
+            var result = await _chatService.DeleteMessageAsync(id);
+            if (!result)
             {
                 return NotFound();
             }
-
-            _context.Messages.Remove(message);
-            await _context.SaveChangesAsync();
             return NoContent();
         }
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
@@ -76,3 +64,4 @@ namespace ChatApp.Controllers
         }
     }
 }
+

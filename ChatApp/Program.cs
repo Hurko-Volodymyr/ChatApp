@@ -1,7 +1,9 @@
+using ChatApp.Abstractions;
 using ChatApp.Data;
+using ChatApp.Data.Repositories;
 using ChatApp.Hubs;
+using ChatApp.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace ChatApp
 {
@@ -16,7 +18,8 @@ namespace ChatApp
             builder.Services.AddDbContext<ChatContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddSignalR();
-                //.AddAzureSignalR(builder.Configuration["AzureSignalR:ConnectionString"]);
+            builder.Services.AddScoped<IChatService, ChatService>();
+            builder.Services.AddScoped<IChatRepository, ChatRepository>();
 
             builder.Services.AddControllersWithViews();
 
