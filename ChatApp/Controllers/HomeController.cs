@@ -43,7 +43,7 @@ namespace ChatApp.Controllers
 
             var msg = await _chatService.AddMessageAsync(sender, message);
 
-            await _hubContext.Clients.All.SendAsync("ReceiveMessage", msg.Sender, msg.Content);
+            await _hubContext.Clients.All.SendAsync("ReceiveMessage", msg.Sender, msg.Content, msg.Sentiment, msg.Id);
             return Ok();
         }
 
