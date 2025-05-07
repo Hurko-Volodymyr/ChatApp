@@ -3,159 +3,186 @@
     var messages = ViewBag.Messages as IEnumerable<ChatApp.Models.Message>;
 }
 
-    <title>Chat</title>
-    <style>
-        body {
-            background-color: #e0f7fa;
-            font-family: Arial, sans-serif;
-        }
-
-        .chat-container {
-            background-color: #fff9c4;
-            border-radius: 10px;
-            padding: 20px;
-            width: 50%;
-            margin: auto;
-            margin-top: 50px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        #messagesList {
-            max-height: 400px;
-            overflow-y: auto;
-            margin-bottom: 20px;
-        }
-
-        .message {
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 5px;
-        }
-
-        .message-sender {
-            font-weight: bold;
-        }
-
-        .message-content {
-            display: inline;
-        }
-
-        .form-container {
-            display: flex;
-            flex-direction: column;
-        }
-
-            .form-container input {
-                margin-bottom: 10px;
-                padding: 10px;
-                border-radius: 5px;
-                border: 1px solid #ccc;
-            }
-
-        #sendButton {
-            background-color: #0288d1;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-            #sendButton:disabled {
-                background-color: #b0bec5;
-            }
-
-        .delete-button {
-            background-color: #d32f2f;
-            color: white;
-            border: none;
-            padding: 5px;
-            border-radius: 5px;
-            cursor: pointer;
-            float: right;
-        }
-    </style>
-    <div class="chat-container">
-        <div id="messagesList">
-            @if (messages != null)
-            {
-                @foreach (var message in messages)
-                {
-                    <div class="message" style="color: @(message.Sentiment == "positive" ? "green" : message.Sentiment == "negative" ? "red" : "black")">
-                        <span class="message-sender">@message.Sender: </span>
-                        <span class="message-content">@message.Content</span>
-                        <button class="delete-button" data-id="@message.Id">Delete</button>
+<div class="container py-4 fade-in">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-secondary text-white py-3">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-comments fs-4 me-2"></i>
+                        <h4 class="mb-0">ChatApp Messenger</h4>
                     </div>
-                }
-            }
-        </div>
-        <div class="form-container">
-            <input id="userName" type="text" placeholder="Enter your username" />
-            <input type="text" id="messageInput" placeholder="Enter your message" />
-            <button id="sendButton" disabled="disabled">Send</button>
+                </div>
+                <div class="card-body bg-light p-0">
+                    <div id="messagesList" class="p-3" style="height: 400px; overflow-y: auto;">
+                        @if (messages != null)
+                        {
+                            @foreach (var message in messages)
+                            {
+                                <div class="message-container mb-3 slide-in" data-id="@message.Id">
+                                    <div class="card @(message.Sentiment == "positive" ? "border-success" : message.Sentiment == "negative" ? "border-danger" : "border-secondary")">
+                                        <div class="card-body py-2 px-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="message-avatar bg-secondary text-white rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                                        <span>@(string.IsNullOrEmpty(message.Sender) ? "A" : message.Sender[0].ToString().ToUpper())</span>
+                                                    </div>
+                                                    <span class="message-sender fw-bold">@message.Sender</span>
+                                                </div>
+                                                <div>
+                                                    <small class="text-muted">@message.Timestamp.ToString("MM/dd/yyyy HH:mm")</small>
+                                                    <button class="btn btn-sm btn-danger ms-2 delete-button" data-id="@message.Id">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <p class="message-content mb-0 ms-5">@message.Content</p>
+                                            <div class="ms-5 mt-1">
+                                                <span class="badge @(message.Sentiment == "positive" ? "bg-success" : message.Sentiment == "negative" ? "bg-danger" : "bg-secondary")">
+                                                    <i class="fas @(message.Sentiment == "positive" ? "fa-smile" : message.Sentiment == "negative" ? "fa-frown" : "fa-meh") me-1"></i>
+                                                    @message.Sentiment
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                    <div class="card-footer border-top p-3 bg-white">
+                        <div class="form-container">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text bg-secondary text-white">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input id="userName" type="text" class="form-control form-control-lg" placeholder="Your name" />
+                            </div>
+                            <div class="input-group">
+                                <input id="messageInput" type="text" class="form-control form-control-lg" placeholder="Type your message..." />
+                                <button id="sendButton" class="btn btn-secondary btn-lg" disabled="disabled">
+                                    <i class="fas fa-paper-plane me-1"></i> Send
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
-    <script>
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("/chat")
-            .build();
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+<script>
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/chat")
+        .build();
 
-        function addMessage(sender, message, sentiment, id) {
-            const messagesList = document.getElementById("messagesList");
-            const messageElement = document.createElement("div");
-            messageElement.classList.add("message");
-            messageElement.style.color = sentiment === 'positive' ? 'green' : sentiment === 'negative' ? 'red' : 'black';
-            messageElement.innerHTML = `<span class="message-sender">${sender}: </span><span class="message-content">${message}</span><button class="delete-button" data-id="${id}">Delete</button>`;
-            messagesList.appendChild(messageElement);
-            messagesList.scrollTop = messagesList.scrollHeight;
+    function addMessage(sender, message, sentiment, id) {
+        const messagesList = document.getElementById("messagesList");
+        const timestamp = new Date().toLocaleString('en-US', { 
+            month: '2-digit', 
+            day: '2-digit', 
+            year: 'numeric', 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        
+        const senderInitial = sender ? sender[0].toUpperCase() : 'A';
+        const badgeClass = sentiment === 'positive' ? 'bg-success' : sentiment === 'negative' ? 'bg-danger' : 'bg-secondary';
+        const borderClass = sentiment === 'positive' ? 'border-success' : sentiment === 'negative' ? 'border-danger' : 'border-secondary';
+        const iconClass = sentiment === 'positive' ? 'fa-smile' : sentiment === 'negative' ? 'fa-frown' : 'fa-meh';
+        
+        const messageContainer = document.createElement("div");
+        messageContainer.classList.add("message-container", "mb-3", "slide-in");
+        messageContainer.setAttribute("data-id", id);
+        
+        messageContainer.innerHTML = `
+            <div class="card ${borderClass}">
+                <div class="card-body py-2 px-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div class="d-flex align-items-center">
+                            <div class="message-avatar bg-secondary text-white rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                <span>${senderInitial}</span>
+                            </div>
+                            <span class="message-sender fw-bold">${sender}</span>
+                        </div>
+                        <div>
+                            <small class="text-muted">${timestamp}</small>
+                            <button class="btn btn-sm btn-danger ms-2 delete-button" data-id="${id}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="message-content mb-0 ms-5">${message}</p>
+                    <div class="ms-5 mt-1">
+                        <span class="badge ${badgeClass}">
+                            <i class="fas ${iconClass} me-1"></i>
+                            ${sentiment}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        messagesList.appendChild(messageContainer);
+        messagesList.scrollTop = messagesList.scrollHeight;
+    }
+
+    connection.on("ReceiveMessage", (sender, message, sentiment, id) => {
+        addMessage(sender, message, sentiment, id);
+    });
+
+    document.getElementById("sendButton").addEventListener("click", async () => {
+        const userName = document.getElementById("userName").value || "Anonymous";
+        const message = document.getElementById("messageInput").value;
+        
+        if (!message.trim()) return;
+        
+        try {
+            await fetch('/Home/SendMessage', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'sender': userName,
+                    'message': message
+                })
+            });
+            document.getElementById("messageInput").value = '';
+        } catch (err) {
+            console.error('Error sending message:', err);
         }
+    });
+    
+    // Add ability to send message by pressing Enter
+    document.getElementById("messageInput").addEventListener("keypress", function(event) {
+        if (event.key === "Enter" && !document.getElementById("sendButton").disabled) {
+            document.getElementById("sendButton").click();
+        }
+    });
 
-        connection.on("ReceiveMessage", (sender, message, sentiment, id) => {
-            addMessage(sender, message, sentiment, id);
-        });
+    connection.start()
+        .then(function () {
+            document.getElementById("sendButton").disabled = false;
+        })
+        .catch(err => console.error(err.toString()));
 
-        document.getElementById("sendButton").addEventListener("click", async () => {
-            const userName = document.getElementById("userName").value;
-            const message = document.getElementById("messageInput").value;
+    document.getElementById("messagesList").addEventListener("click", async (e) => {
+        if (e.target.classList.contains("delete-button") || e.target.closest(".delete-button")) {
+            const button = e.target.classList.contains("delete-button") ? e.target : e.target.closest(".delete-button");
+            const id = button.getAttribute("data-id");
             try {
-                await fetch('/Home/SendMessage', {
+                await fetch(`/Home/DeleteMessage?id=${id}`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        'sender': userName,
-                        'message': message
-                    })
                 });
-                document.getElementById("messageInput").value = '';
-            } catch (err) {
-                console.error('Error sending message:', err);
-            }
-        });
-
-        connection.start()
-            .then(function () {
-                document.getElementById("sendButton").disabled = false;
-            })
-            .catch(err => console.error(err.toString()));
-
-        document.getElementById("messagesList").addEventListener("click", async (e) => {
-            if (e.target.classList.contains("delete-button")) {
-                const id = e.target.getAttribute("data-id");
-                try {
-                    await fetch(`/Home/DeleteMessage/${id}`, {
-                        method: 'DELETE',
-                    });
-                    e.target.parentElement.remove();
-                } catch (err) {
-                    console.error('Error deleting message:', err);
+                const messageContainer = document.querySelector(`.message-container[data-id="${id}"]`);
+                if (messageContainer) {
+                    messageContainer.remove();
                 }
+            } catch (err) {
+                console.error('Error deleting message:', err);
             }
-        });
-    </script>
+        }
+    });
+</script>
