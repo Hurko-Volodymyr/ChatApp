@@ -280,3 +280,61 @@ main {
 .delete-button:hover {
   transform: scale(1.05);
 }
+
+/* Enhanced mobile styles for chat interface */
+@media (max-width: 576px) {
+  .message-container {
+    margin-bottom: 0.75rem !important;
+  }
+  
+  .message-container .card {
+    border-width: 1px;
+  }
+  
+  .message-container .card-body {
+    padding: 0.5rem !important;
+  }
+  
+  .delete-button {
+    min-width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+  }
+  
+  .badge {
+    padding: 0.3rem 0.5rem;
+  }
+  
+  #sendButton {
+    min-width: 3rem;
+  }
+  
+  .input-group > .form-control {
+    height: 2.5rem;
+  }
+  
+  .input-group-text {
+    height: 2.5rem;
+  }
+  
+  .text-muted {
+    font-size: 0.7rem;
+  }
+}
+
+/* Improve date display on mobile */
+@media (max-width: 400px) {
+  .message-container .text-muted {
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+  
+  .delete-button {
+    padding: 0.15rem !important;
+    margin-left: 0 !important;
+    margin-top: 0.2rem;
+  }
+}
