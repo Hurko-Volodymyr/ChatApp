@@ -39,6 +39,7 @@ body {
 
 .container {
   width: 100%;
+  max-width: 1200px;
   padding-right: 15px;
   padding-left: 15px;
   margin-right: auto;
@@ -47,6 +48,10 @@ body {
 
 main {
   flex: 1 0 auto;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Navbar styles */
@@ -104,9 +109,13 @@ main {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+.message-container .card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.message-container .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 /* Form controls */
@@ -140,7 +149,7 @@ main {
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* Responsive fixes for footer */
+/* Responsive fixes for content and forms */
 @media (max-width: 767px) {
   .footer {
     text-align: center;
@@ -151,9 +160,123 @@ main {
     text-align: center !important;
     margin-top: 0.5rem;
   }
+
+  main {
+    padding-bottom: 3rem;
+  }
+  
+  .container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  
+  .card-body {
+    padding: 0.75rem;
+  }
+  
+  .message-container .card {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
+  .message-avatar {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 0.8rem;
+  }
+  
+  .message-sender {
+    font-size: 0.9rem;
+  }
+  
+  .delete-button {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.7rem;
+  }
+  
+  .badge {
+    font-size: 0.7rem;
+  }
+  
+  #messagesList {
+    padding: 10px !important;
+  }
+  
+  .card-footer {
+    padding: 0.75rem !important;
+  }
+  
+  .form-container {
+    padding: 0 !important;
+  }
+}
+
+/* Form container styles for better centering */
+.form-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem;
 }
 
 /* Fix for elements overlapping */
 .footer .row {
   flex-wrap: wrap;
+}
+
+/* Add smooth scrolling to message list */
+#messagesList {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #6c757d #f8f9fa;
+}
+
+#messagesList::-webkit-scrollbar {
+  width: 8px;
+}
+
+#messagesList::-webkit-scrollbar-track {
+  background: #f8f9fa;
+}
+
+#messagesList::-webkit-scrollbar-thumb {
+  background-color: #6c757d;
+  border-radius: 10px;
+  border: 2px solid #f8f9fa;
+}
+
+/* Improved input focus states */
+.form-control:focus {
+  box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+  border-color: #6c757d;
+}
+
+/* Small devices (landscape phones) */
+@media (max-width: 576px) {
+  .form-container {
+    padding: 0.5rem !important;
+  }
+  
+  .input-group > .btn {
+    padding: 0.4rem 0.6rem;
+  }
+  
+  .navbar-brand {
+    font-size: 1.1rem;
+  }
+  
+  .container {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+}
+
+/* Hover effects for buttons */
+.btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #545b62;
+}
+
+.delete-button:hover {
+  transform: scale(1.05);
 }
